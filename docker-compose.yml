@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  postgres:
+    environment:
+      PGDATA: /var/lib/postgresql/data/guacamole
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_USER: ${DATABASE_USER}
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ${PWD}/postgresql:/var/lib/postgresql/data:rw
+
+  guacd:
+    image: guacamole/guacd:latest
+    restart: always
+
+  guacamole:
+    image: guacamole/guacamole:latest
+    restart: always
+    ports:
+      - ${PORT}:8080
+    environment:
+      GUACD_HOSTNAME: guacd
+      POSTGRES_DATABASE: ${DATABASE_NAME}
+      POSTGRES_HOSTNAME: postgres
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_USER: ${DATABASE_USER}
